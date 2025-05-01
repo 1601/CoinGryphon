@@ -407,36 +407,88 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Connect to the Gryphon device
      */
+    /**
+     * Connect to the Gryphon device - matches C++ OnOpenport() function
+     */
     private void connectToDevice() {
         if (serialManager.connectToDevice()) {
-            addLogMessage("Connecting to device...");
+            addLogMessage("Connected to device on " + serialManager.getPortPath());
             
-            // Schedule initialization sequence after connection is established
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (serialManager.isConnected()) {
-                        initializeConnection();
-                    } else {
-                        // If not connected yet, try again
-                        reconnectWithDelay(1000);
+            // Following C++ reference code in OnOpenport:  OnReset() then OnSelftest()
+            // First send a reset command
+            if (gryphonProtocol.sendReset()) {
+                addLogMessage("Reset --> OK");
+                addLogMessage("--------------------------------------------");
+                
+                // Then perform self-test (which also gets coin configuration)
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (gryphonProtocol.sendSetup()) {
+                            addLogMessage("The configuration of the current module:");
+                            // Setup response will come through the response listener
+                        }
                     }
-                }
-            }, 1000); // Give the connection a second to establish
+                }, 200); // 200ms delay like in C++ code
+                
+                // Enable all UI controls after successful connection
+                enableControlsAfterConnection(true);
+            }
         } else {
-            addLogMessage("No devices found or permission denied - will retry...");
-            reconnectWithDelay(3000); // Try again in 3 seconds
+            addLogMessage("Failed to open the serial port");
+            addLogMessage("Please confirm if the serial port number is correct, or the connection status of communication cable and power cable");
         }
+    }
+    
+    /**
+     * Enable or disable controls based on connection state
+     * Matches behavior in C++ OnOpenport and OnCloseport functions
+     */
+    private void enableControlsAfterConnection(boolean connected) {
+        // Connection controls
+        findViewById(R.id.btnConnect).setEnabled(!connected);
+        findViewById(R.id.btnDisconnect).setEnabled(connected);
+        
+        // Command controls
+        findViewById(R.id.btnPoll).setEnabled(connected);
+        findViewById(R.id.btnReset).setEnabled(connected);
+        findViewById(R.id.btnSetup).setEnabled(connected);
+        findViewById(R.id.btnSelfTest).setEnabled(connected);
+        findViewById(R.id.btnTubeStatus).setEnabled(connected);
+        findViewById(R.id.btnCoinType).setEnabled(connected);
+        findViewById(R.id.btnStartPolling).setEnabled(connected);
+        findViewById(R.id.btnStopPolling).setEnabled(connected);
+        
+        // Dispense controls
+        findViewById(R.id.btnDispense).setEnabled(connected);
+        findViewById(R.id.btnDispenseType).setEnabled(connected);
+        findViewById(R.id.spinnerCoinType).setEnabled(connected);
+        findViewById(R.id.etDispenseAmount).setEnabled(connected);
+        findViewById(R.id.etDispenseCount).setEnabled(connected);
     }
     
     /**
      * Disconnect from the Gryphon device
      */
+    /**
+     * Disconnect from the Gryphon device - matches C++ OnCloseport() function
+     */
     private void disconnectDevice() {
+        // Stop polling first
+        stopPolling();
+        
+        // Close the connection
         serialManager.closeConnection();
+        
+        // Disable all controls except Connect
+        enableControlsAfterConnection(false);
+        
+        // Clear the log display
+        clearLog();
+        
+        // Update status
         updateConnectionStatus("Disconnected");
         addLogMessage("Disconnected from device");
-        stopPolling(); // Stop polling when disconnected
     }
     
     /**
@@ -639,76 +691,68 @@ public class MainActivity extends AppCompatActivity {
     }
     
     /**
-     * Display the tube status information
+     * Display the tube status information - matches C++ OnBnClickedTube implementation
      */
     private void displayTubeStatus(byte[] data) {
-        if (data.length < 3) {
-            addLogMessage("Invalid tube status data received");
+        if (data == null || data.length < 18) {
+            addLogMessage("Invalid tube status data");
             return;
         }
         
-        // Tube full indicators (first two bytes)
-        byte tubeFullHigh = data[0];
-        byte tubeFullLow = data[1];
+        addLogMessage("TUBE STATUS --> OK");
+        addLogMessage("--------------------------------------------");
         
-        StringBuilder fullTubesInfo = new StringBuilder("Full tubes: ");
-        boolean anyFull = false;
-        
-        // Check the full tube bits
-        for (int i = 0; i < 8; i++) {
-            if ((tubeFullLow & (1 << i)) != 0) {
-                fullTubesInfo.append("Type ").append(i+1).append(", ");
-                anyFull = true;
-            }
-        }
-        
-        for (int i = 0; i < 8; i++) {
-            if ((tubeFullHigh & (1 << i)) != 0) {
-                fullTubesInfo.append("Type ").append(i+9).append(", ");
-                anyFull = true;
-            }
-        }
-        
-        if (anyFull) {
-            addLogMessage(fullTubesInfo.toString());
-        } else {
-            addLogMessage("No tubes are full");
-        }
-        
-        // Tube counts (remaining bytes)
-        StringBuilder tubeCountsInfo = new StringBuilder("Tube counts:\n");
-        boolean anyCoins = false;
+        // First two bytes represent full tube status
+        int fullTubeStatus1 = data[0] & 0xFF;
+        int fullTubeStatus2 = data[1] & 0xFF;
         
         // Get coin denominations for better display
         Map<Integer, Double> denominations = gryphonProtocol.getCoinDenominations();
+        int scaleFactor = gryphonProtocol.getScaleFactor();
         
-        for (int i = 0; i < 16; i++) {
-            if (i + 2 < data.length && data[i + 2] > 0) {
-                int count = data[i + 2] & 0xFF;
-                String denomination = "";
-                if (denominations.containsKey(i + 1)) {
-                    denomination = String.format(" (%.2f)", denominations.get(i + 1));
-                }
+        // Check full tube status
+        for (int i = 0; i < 8; i++) {
+            if ((fullTubeStatus1 & (1 << i)) != 0) {
+                String denomination = formatCoinValue(denominations.getOrDefault(i+1, 0.0));
+                addLogMessage("The tube of type" + (i+1) + ":" + denomination + ",is already full");
+            }
+        }
+        
+        for (int i = 0; i < 8; i++) {
+            if ((fullTubeStatus2 & (1 << i)) != 0) {
+                String denomination = formatCoinValue(denominations.getOrDefault(i+9, 0.0));
+                addLogMessage("The tube of type" + (i+9) + ":" + denomination + ",is already full");
+            }
+        }
+        
+        // Tube counts (remaining bytes) - like C++ code lines 1013-1027
+        boolean anyCoins = false;
+        
+        // Process tube status data for coins in tubes
+        for (int i = 0; i < 16 && i + 2 < data.length; i++) {
+            int count = data[i + 2] & 0xFF;
+            if (count > 0) {
+                // In C++ it alternates between denom01 and denom02
+                String coinValue = formatCoinValue(
+                    denominations.getOrDefault((i % 2) + 1, 0.0));
                 
-                tubeCountsInfo.append("Type ").append(i + 1)
-                        .append(denomination)
-                        .append(": ").append(count).append(" coins\n");
+                addLogMessage("Type" + (i+1) + ":" + coinValue + ",has been accepting " + count + "coins");
                 anyCoins = true;
             }
         }
         
-        if (anyCoins) {
-            addLogMessage(tubeCountsInfo.toString());
-        } else {
-            addLogMessage("No coins in tubes");
+        if (!anyCoins) {
+            addLogMessage("No any coins in changer");
         }
+        
+        addLogMessage("--------------------------------------------");
     }
     
     /**
-     * Display the self-test results
+     * Display the self-test results - matches C++ OnBnClickedAbout implementation
      */
     private void displaySelfTestResults(byte[] data) {
-        if (data.length < 1) {
+        if (data == null || data.length < 1) {
             addLogMessage("Invalid self-test data received");
             return;
         }
@@ -716,22 +760,35 @@ public class MainActivity extends AppCompatActivity {
         int statusCode = data[0] & 0xFF;
         String statusMessage = "Unknown status";
         
+        // Following C++ OnBnClickedAbout() implementation for error/status codes
+        addLogMessage("error/status: ");
+        
         switch (statusCode) {
-            case 1:  statusMessage = "Powering up"; break;
-            case 2:  statusMessage = "Powering down"; break;
-            case 3:  statusMessage = "Normal operation"; break;
-            case 4:  statusMessage = "Keypad shifted"; break;
-            case 5:  statusMessage = "Manual fill/New inventory available"; break;
-            case 6:  statusMessage = "Inhibited by VMC"; break;
-            case 16: statusMessage = "Changer error"; break;
-            case 17: statusMessage = "Discriminator changer error"; break;
-            case 18: statusMessage = "Accept gate module error"; break;
-            case 19: statusMessage = "Separator module error"; break;
-            case 20: statusMessage = "Dispenser module error"; break;
-            case 21: statusMessage = "Coin tube module error"; break;
+            case 1:  statusMessage = "01 00 -> powering up"; break;
+            case 2:  statusMessage = "02 00 -> powering down"; break;
+            case 3:  statusMessage = "03 00 -> normal"; break;
+            case 4:  statusMessage = "04 00 -> Keypad shifted"; break;
+            case 5:  statusMessage = "05 10/20 -> Manual fill/New inventory available"; break;
+            case 6:  statusMessage = "06 00 -> Inhibited by VMC"; break;
+            case 16: statusMessage = "10 E2 -> Changer error"; break;
+            case 17: statusMessage = "11 E2 -> Discriminator changer error"; break;
+            case 18: statusMessage = "12 E2 -> Accept gate module error"; break;
+            case 19: statusMessage = "13 E2 -> Separator module error"; break;
+            case 20: statusMessage = "14 E2 -> Dispenser module error"; break;
+            case 21: statusMessage = "15 E2 -> Coin tube module error"; break;
         }
         
-        addLogMessage("Self-test status: " + statusCode + " - " + statusMessage);
+        addLogMessage(statusMessage);
+        addLogMessage("--------------------------------------------");
+    }
+    
+    /**
+     * Format a coin value for display, similar to the C++ implementation
+     * @param value The coin value to format
+     * @return Formatted string representation of the coin value
+     */
+    private String formatCoinValue(double value) {
+        return String.format("%.2f", value);
     }
     
     /**
