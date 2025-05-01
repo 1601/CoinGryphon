@@ -237,6 +237,14 @@ public class GryphonSerialManager {
     }
     
     /**
+     * Get the serial port path being used
+     * @return The serial port path (e.g., /dev/ttyS4)
+     */
+    public String getPortPath() {
+        return SERIAL_PORT_PATH;
+    }
+    
+    /**
      * Send data to the serial port
      * @param data Data to send
      * @return true if sent successfully

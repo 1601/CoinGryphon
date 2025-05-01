@@ -3,6 +3,8 @@ package com.example.coingryphon.serial;
 import android.util.Log;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * GryphonProtocol handles specific command protocols for the Gryphon coin acceptor.
@@ -17,6 +19,8 @@ public class GryphonProtocol {
     private static final byte[] CMD_RESET = new byte[] {0x08, 0x08};
     private static final byte[] CMD_SETUP = new byte[] {0x09, 0x09};
     private static final byte[] CMD_COIN_TYPE = new byte[] {0x0C, (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF, 0x08};
+    private static final byte[] CMD_TUBE_STATUS = new byte[] {0x0A, 0x0A};
+    private static final byte[] CMD_SELF_TEST = new byte[] {0x0F, 0x05, 0x14}; // Diagnostic status
     
     // Response constants
     private static final byte RESP_ACK = 0x00;
@@ -38,6 +42,15 @@ public class GryphonProtocol {
     private int pollRetryCount = 0;
     private int setupRetryCount = 0;
     private int coinTypeRetryCount = 0;
+    private int dispenseRetryCount = 0;
+    private int tubeStatusRetryCount = 0;
+    private int selfTestRetryCount = 0;
+    
+    // Coin denomination values from setup response
+    private Map<Integer, Double> coinDenominations = new HashMap<>();
+    
+    // Scaling factor from setup response
+    private int scaleFactor = 1;
     
     /**
      * Command types for the Gryphon coin acceptor
@@ -46,7 +59,10 @@ public class GryphonProtocol {
         POLL,
         RESET,
         SETUP,
-        COIN_TYPE
+        COIN_TYPE,
+        DISPENSE,
+        TUBE_STATUS,
+        SELF_TEST
     }
     
     /**
@@ -56,7 +72,10 @@ public class GryphonProtocol {
         SUCCESS,
         ERROR,
         COIN_ACCEPTED,
-        TIMEOUT
+        TIMEOUT,
+        DISPENSED,
+        TUBE_FULL,
+        DIAGNOSTIC_STATUS
     }
     
     /**
@@ -142,6 +161,18 @@ public class GryphonProtocol {
                 processCoinTypeResponse(data);
                 break;
                 
+            case DISPENSE:
+                processDispenseResponse(data);
+                break;
+                
+            case TUBE_STATUS:
+                processTubeStatusResponse(data);
+                break;
+                
+            case SELF_TEST:
+                processSelfTestResponse(data);
+                break;
+                
             default:
                 Log.w(TAG, "Unknown command type: " + currentCommand);
                 break;
@@ -195,6 +226,27 @@ public class GryphonProtocol {
                         coinTypeRetryCount = 0;
                     }
                     break;
+                case DISPENSE:
+                    dispenseRetryCount++;
+                    if (dispenseRetryCount > MAX_RETRIES) {
+                        maxRetriesReached = true;
+                        dispenseRetryCount = 0;
+                    }
+                    break;
+                case TUBE_STATUS:
+                    tubeStatusRetryCount++;
+                    if (tubeStatusRetryCount > MAX_RETRIES) {
+                        maxRetriesReached = true;
+                        tubeStatusRetryCount = 0;
+                    }
+                    break;
+                case SELF_TEST:
+                    selfTestRetryCount++;
+                    if (selfTestRetryCount > MAX_RETRIES) {
+                        maxRetriesReached = true;
+                        selfTestRetryCount = 0;
+                    }
+                    break;
             }
             
             if (maxRetriesReached) {
@@ -246,6 +298,17 @@ public class GryphonProtocol {
                     break;
                 case COIN_TYPE:
                     resent = sendCoinType();
+                    break;
+                case TUBE_STATUS:
+                    resent = sendTubeStatus();
+                    break;
+                case SELF_TEST:
+                    resent = sendSelfTest();
+                    break;
+                // Don't auto-resend dispense commands as they might dispense twice
+                case DISPENSE:
+                    // Don't resend, just notify about timeout
+                    resent = false;
                     break;
             }
             
@@ -465,6 +528,9 @@ public class GryphonProtocol {
             
             // If we got the full response
             if (data.length >= 24) {
+                // Parse the denomination data
+                parseDenominationData(data);
+                
                 if (responseListener != null) {
                     responseListener.onCommandResponse(
                         CommandType.SETUP,
@@ -509,6 +575,66 @@ public class GryphonProtocol {
     }
     
     /**
+     * Parse the denomination data from setup response
+     * This follows the logic from the C++ code in OnSelftest()
+     */
+    private void parseDenominationData(byte[] data) {
+        // Clear existing denominations
+        coinDenominations.clear();
+        
+        // Check if we have enough data to parse
+        if (data.length < 14) {
+            Log.w(TAG, "Setup response too short to parse denominations");
+            return;
+        }
+        
+        // Extract the scaling factor (same as m_scale in C++ code)
+        int scale = data[3] & 0xFF;
+        this.scaleFactor = scale;
+        Log.d(TAG, "Scaling factor: " + scale);
+        
+        // Extract decimal places
+        int decimalPlaces = data[4] & 0xFF;
+        Log.d(TAG, "Decimal places: " + decimalPlaces);
+        
+        // Determine if we have a C2 hardware (14 bytes) or Gryphon hardware (24 bytes)
+        boolean isGryphonHardware = (data.length >= 24);
+        int maxCoins = isGryphonHardware ? 16 : 6;
+        
+        // Log the hardware type
+        Log.d(TAG, "Detected " + (isGryphonHardware ? "Gryphon" : "C2") + " hardware");
+        
+        // Parse coin denominations - start at byte 7
+        for (int i = 0; i < maxCoins; i++) {
+            if (i + 7 >= data.length || data[i + 7] == 0) {
+                // No more coin types or end of data
+                break;
+            }
+            
+            double denomination = 0.0;
+            int coinValue = data[i + 7] & 0xFF;
+            
+            // Apply decimal places and scaling factor, same as in C++ code
+            if (decimalPlaces < 6) {
+                switch (decimalPlaces) {
+                    case 0: denomination = coinValue * scale; break;
+                    case 1: denomination = (double)(coinValue * scale) / 10; break;
+                    case 2: denomination = (double)(coinValue * scale) / 100; break;
+                    case 3: denomination = (double)(coinValue * scale) / 1000; break;
+                    case 4: denomination = (double)(coinValue * scale) / 10000; break;
+                    case 5: denomination = (double)(coinValue * scale) / 100000; break;
+                }
+            } else {
+                denomination = coinValue * scale;
+            }
+            
+            // Store the denomination (coin type is 1-indexed in the UI)
+            coinDenominations.put(i + 1, denomination);
+            Log.d(TAG, "Coin Type " + (i + 1) + ": " + denomination);
+        }
+    }
+    
+    /**
      * Send Coin Type command
      * write: 0C FF FF FF FF 08
      * expected response: 00
@@ -547,5 +673,216 @@ public class GryphonProtocol {
                 );
             }
         }
+    }
+    
+    /**
+     * Send dispense command to dispense coins
+     * Based on OnBnClickedDispense2() in C++ code
+     * 
+     * @param amount Amount to dispense (in the same unit as coin denominations)
+     * @return true if command was sent successfully
+     */
+    public boolean sendDispense(int amount) {
+        if (pendingCommand != null) {
+            return false; // Command in progress
+        }
+        
+        if (amount <= 0) {
+            Log.e(TAG, "Invalid dispense amount: " + amount);
+            return false;
+        }
+        
+        // Check if amount is divisible by scale factor
+        if (amount % scaleFactor != 0) {
+            Log.e(TAG, "Amount " + amount + " is not divisible by scale factor " + scaleFactor);
+            return false;
+        }
+        
+        // Calculate data value
+        int data = amount / scaleFactor;
+        
+        // Create dispense command
+        byte[] dispenseCommand = new byte[] {
+            0x0F, 0x02, (byte)data, (byte)(0x0F + 0x02 + data) // Command + checksum
+        };
+        
+        Log.d(TAG, "Sending dispense command for amount: " + amount + ", data: " + data);
+        
+        pendingCommand = CommandType.DISPENSE;
+        lastCommandTime = System.currentTimeMillis();
+        
+        return serialManager.sendData(dispenseCommand);
+    }
+    
+    /**
+     * Process Dispense response
+     */
+    private void processDispenseResponse(byte[] data) {
+        if (data.length == 1 && data[0] == RESP_ACK) {
+            // Dispense acknowledged
+            if (responseListener != null) {
+                responseListener.onCommandResponse(
+                    CommandType.DISPENSE,
+                    ResponseStatus.DISPENSED,
+                    data
+                );
+            }
+        } else {
+            // Error or unknown response
+            if (responseListener != null) {
+                responseListener.onCommandResponse(
+                    CommandType.DISPENSE,
+                    ResponseStatus.ERROR,
+                    data
+                );
+            }
+        }
+    }
+    
+    /**
+     * Send a specific coin type dispense command
+     * Based on OnBnClickedButton2() in C++ code
+     * 
+     * @param coinType The coin type to dispense (1-16)
+     * @param count The number of coins to dispense
+     * @return true if command was sent successfully
+     */
+    public boolean sendDispenseType(int coinType, int count) {
+        if (pendingCommand != null) {
+            return false; // Command in progress
+        }
+        
+        if (coinType <= 0 || coinType > 15) {
+            Log.e(TAG, "Invalid coin type: " + coinType);
+            return false;
+        }
+        
+        if (count <= 0) {
+            Log.e(TAG, "Invalid coin count: " + count);
+            return false;
+        }
+        
+        // Calculate byte values using binary encoding logic from C++ code
+        int byte01 = (count & 0x0F) << 4 | (coinType & 0x0F);
+        
+        // Create dispense command
+        byte[] dispenseCommand = new byte[] {
+            0x0D, (byte)byte01, (byte)(0x0D + byte01) // Command + checksum
+        };
+        
+        Log.d(TAG, "Sending dispense type command for type: " + coinType + ", count: " + count + ", encoded: " + byte01);
+        
+        pendingCommand = CommandType.DISPENSE;
+        lastCommandTime = System.currentTimeMillis();
+        
+        return serialManager.sendData(dispenseCommand);
+    }
+    
+    /**
+     * Send tube status command
+     * Based on OnBnClickedTube() in C++ code
+     * 
+     * @return true if command was sent successfully
+     */
+    public boolean sendTubeStatus() {
+        if (pendingCommand != null) {
+            return false; // Command in progress
+        }
+        
+        pendingCommand = CommandType.TUBE_STATUS;
+        lastCommandTime = System.currentTimeMillis();
+        
+        return serialManager.sendData(CMD_TUBE_STATUS);
+    }
+    
+    /**
+     * Process Tube Status response
+     */
+    private void processTubeStatusResponse(byte[] data) {
+        if (data.length >= 19) {
+            // Process tube status response
+            // First two bytes contain the full tube status bitmaps
+            byte tubeFullHigh = data[0];
+            byte tubeFullLow = data[1];
+            
+            // Bytes 2-18 contain the count of coins in each tube
+            byte[] tubeCounts = new byte[16];
+            System.arraycopy(data, 2, tubeCounts, 0, Math.min(16, data.length - 2));
+            
+            if (responseListener != null) {
+                responseListener.onCommandResponse(
+                    CommandType.TUBE_STATUS,
+                    ResponseStatus.SUCCESS,
+                    data
+                );
+            }
+        } else {
+            // Incomplete response
+            if (responseListener != null) {
+                responseListener.onCommandResponse(
+                    CommandType.TUBE_STATUS,
+                    ResponseStatus.ERROR,
+                    data
+                );
+            }
+        }
+    }
+    
+    /**
+     * Send self test command
+     * Based on OnBnClickedAbout() in C++ code
+     * 
+     * @return true if command was sent successfully
+     */
+    public boolean sendSelfTest() {
+        if (pendingCommand != null) {
+            return false; // Command in progress
+        }
+        
+        pendingCommand = CommandType.SELF_TEST;
+        lastCommandTime = System.currentTimeMillis();
+        
+        return serialManager.sendData(CMD_SELF_TEST);
+    }
+    
+    /**
+     * Process Self Test response
+     */
+    private void processSelfTestResponse(byte[] data) {
+        if (data.length >= 3) {
+            // Process diagnostic status response
+            if (responseListener != null) {
+                responseListener.onCommandResponse(
+                    CommandType.SELF_TEST,
+                    ResponseStatus.DIAGNOSTIC_STATUS,
+                    data
+                );
+            }
+        } else {
+            // Incomplete response
+            if (responseListener != null) {
+                responseListener.onCommandResponse(
+                    CommandType.SELF_TEST,
+                    ResponseStatus.ERROR,
+                    data
+                );
+            }
+        }
+    }
+    
+    /**
+     * Get the coin denominations map parsed from setup response
+     * @return Map of coin types (1-indexed) to their denominations
+     */
+    public Map<Integer, Double> getCoinDenominations() {
+        return new HashMap<>(coinDenominations);
+    }
+    
+    /**
+     * Get the scale factor parsed from setup response
+     * @return The scale factor
+     */
+    public int getScaleFactor() {
+        return scaleFactor;
     }
 }

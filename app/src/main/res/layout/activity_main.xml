@@ -61,6 +61,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Disconnect" />
+                    <EditText
+                    android:id="@+id/etDispenseAmount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:hint="Amount"
+                    android:inputType="number" />
+
+                <Button
+                    android:id="@+id/btnDispense"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                android:text="Dispense" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -140,6 +154,42 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Stop Polling" />
+
+                     <Button
+                    android:id="@+id/btnSelfTest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Self Test" />
+
+                <Button
+                    android:id="@+id/btnTubeStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Tube Status" />
+
+                    <Spinner
+                    android:id="@+id/spinnerCoinType"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1" />
+
+                <EditText
+                    android:id="@+id/etDispenseCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:ems="3"
+                    android:hint="Count"
+                    android:inputType="number" />
+
+                <Button
+                    android:id="@+id/btnDispenseType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dispense Type" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
