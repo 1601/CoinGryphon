@@ -24,7 +24,7 @@ public class GryphonSerialManager {
     private static final String TAG = "GryphonSerialManager";
     
     // Serial port path
-    private static final String SERIAL_PORT_PATH = "/dev/ttyS5";
+    private static final String SERIAL_PORT_PATH = "/dev/ttyS4"; //
     
     // Communication parameters
     private static final int BAUD_RATE = 9600;

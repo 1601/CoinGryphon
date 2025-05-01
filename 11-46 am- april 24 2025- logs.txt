@@ -1,0 +1,370 @@
+---------------------------- PROCESS STARTED (4183) for package com.example.coingryphon ----------------------------
+2025-04-24 11:45:41.323  4183-4183  NetworkSecurityConfig   com.example.coingryphon              D  No Network Security Config specified, using platform default
+2025-04-24 11:45:41.325  4183-4183  NetworkSecurityConfig   com.example.coingryphon              D  No Network Security Config specified, using platform default
+2025-04-24 11:45:41.525  4183-4199  System                  com.example.coingryphon              W  A resource failed to call close. 
+2025-04-24 11:45:41.584  4183-4183  AppCompatDelegate       com.example.coingryphon              D  Checking for metadata for AppLocalesMetadataHolderService : Service not found
+2025-04-24 11:45:41.910  4183-4183  ple.coingrypho          com.example.coingryphon              W  Accessing hidden method Landroid/view/View;->computeFitSystemWindows(Landroid/graphics/Rect;Landroid/graphics/Rect;)Z (greylist, reflection, allowed)
+2025-04-24 11:45:41.912  4183-4183  ple.coingrypho          com.example.coingryphon              W  Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (greylist, reflection, allowed)
+2025-04-24 11:45:42.239  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Configured serial port parameters
+2025-04-24 11:45:42.241  4183-4183  SerialPort              com.example.coingryphon              I  Using pure Java implementation for serial port access
+2025-04-24 11:45:42.259  4183-4183  SerialPort              com.example.coingryphon              D  Successfully configured serial port with: stty -F /dev/ttyS5 9600 cs8 -cstopb parenb parmrk -crtscts -ixon -ixoff raw
+2025-04-24 11:45:42.260  4183-4183  SerialPort              com.example.coingryphon              D  Serial port opened with pure Java implementation
+2025-04-24 11:45:42.262  4183-4183  SerialPort              com.example.coingryphon              I  Serial port opened: /dev/ttyS5 with baudrate 9600 and flags 196872
+2025-04-24 11:45:42.262  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Opened serial port with SerialPort API
+2025-04-24 11:45:42.265  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Serial connection established
+2025-04-24 11:45:42.329  4183-4183  Choreographer           com.example.coingryphon              I  Skipped 55 frames!  The application may be doing too much work on its main thread.
+2025-04-24 11:45:42.434  4183-4307  mali_so                 com.example.coingryphon              I  [File] : hardware/rockchip/mali_so/driver/product/base/src/mali_base_kbase.c; [Line] : 1311; [Func] : base_context_deal_with_version_affairs_rk_ext;
+                                                                                                    arm_release_ver of this mali_so is 'g2p0-01eac0', rk_so_ver is '8@0 '.
+2025-04-24 11:45:42.434  4183-4307  mali_so                 com.example.coingryphon              I  [File] : hardware/rockchip/mali_so/driver/product/base/src/mali_base_kbase.c; [Line] : 1327; [Func] : base_context_deal_with_version_affairs_rk_ext;
+                                                                                                    arm_release_vers are match. to set the full mali_ver 'g2p0-01eac0-x-8@0' as value of 'sys.gmali.version'.
+2025-04-24 11:45:42.563  4183-4307  OpenGLRenderer          com.example.coingryphon              I  Davey! duration=1157ms; Flags=1, IntendedVsync=55725411761497, Vsync=55726328428127, OldestInputEvent=9223372036854775807, NewestInputEvent=0, HandleInputStart=55726337087981, AnimationStart=55726337106647, PerformTraversalsStart=55726337656731, DrawStart=55726486738662, SyncQueued=55726519885999, SyncStart=55726520375707, IssueDrawCommandsStart=55726520721916, SwapBuffers=55726544015293, FrameCompleted=55726569735921, DequeueBufferDuration=331625, QueueBufferDuration=546292, GpuCompleted=0, 
+2025-04-24 11:45:43.268  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:43.280  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:43.280  4183-4183  GryphonProtocol         com.example.coingryphon              D  Reset command sent with result: true
+2025-04-24 11:45:43.782  4183-4183  GryphonProtocol         com.example.coingryphon              D  Forcing SETUP command while RESET is pending
+2025-04-24 11:45:43.783  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:43.795  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:44.569  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:44.570  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:44.584  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:44.685  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:44.697  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:44.697  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:45.198  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:45.199  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:45.213  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:45.314  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:45.329  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:45.330  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:45.831  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:45.831  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:45.846  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:45.947  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:45.961  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:45.961  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:46.462  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:46.463  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:46.482  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:46.583  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:46.597  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:46.597  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:47.098  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:47.099  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:47.113  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:47.214  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:47.227  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:47.227  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:47.468  4183-4678  ProfileInstaller        com.example.coingryphon              D  Installing profile for com.example.coingryphon
+2025-04-24 11:45:47.728  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:47.729  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:47.741  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:47.842  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:47.854  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:47.854  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:48.355  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:48.356  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:48.369  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:48.470  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:48.483  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:48.483  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:48.983  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:48.984  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:49.000  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:49.101  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:49.117  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:49.118  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:49.619  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:49.619  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:49.632  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:49.733  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:49.746  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:49.746  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:50.247  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:50.248  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:50.260  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:50.361  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:50.375  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:50.376  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:50.877  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:50.879  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:50.895  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:50.999  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:51.021  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:51.021  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:51.522  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:51.523  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:51.536  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:51.637  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:51.649  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:51.649  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:52.150  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:52.150  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:52.163  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:52.264  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:52.276  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:52.276  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:52.776  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:52.777  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:52.790  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:52.891  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:52.905  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:52.905  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:53.406  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:53.406  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:53.420  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:53.521  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:53.534  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:53.534  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:54.035  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:54.036  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:54.055  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:54.156  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:54.169  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:54.169  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:54.670  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:54.671  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:54.683  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:54.784  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:54.798  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:54.798  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:55.299  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:55.300  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:55.314  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:55.415  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:55.429  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:55.429  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:55.930  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:55.931  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:55.944  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:56.045  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:56.059  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:56.059  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:56.560  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:56.562  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:56.582  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:56.683  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:56.697  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:56.697  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:57.198  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:57.198  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:57.210  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:57.311  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:57.323  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:57.323  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:57.824  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:57.825  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:57.837  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:57.938  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:57.951  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:57.951  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:58.452  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:58.453  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:58.468  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:58.569  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:58.587  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:58.587  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:59.088  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:59.090  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:59.111  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:59.212  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:59.232  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:59.232  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:45:59.732  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:45:59.733  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:45:59.744  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:59.845  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:45:59.857  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:45:59.857  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:00.358  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:00.359  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:00.372  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:00.473  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:00.486  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:00.486  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:00.987  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:00.988  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:01.002  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:01.103  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:01.116  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:01.116  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:01.616  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:01.617  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:01.630  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:01.730  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:01.744  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:01.745  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:02.245  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:02.246  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:02.257  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:02.358  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:02.370  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:02.370  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:02.871  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:02.872  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:02.883  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:02.984  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:02.996  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:02.996  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:03.497  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:03.498  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:03.509  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:03.610  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:03.621  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:03.621  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:04.121  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:04.122  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:04.135  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:04.236  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:04.248  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:04.248  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:04.749  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:04.750  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:04.762  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:04.863  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:04.876  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:04.876  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:05.377  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:05.377  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:05.390  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:05.491  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:05.506  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:05.506  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:06.007  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:06.007  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:06.021  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:06.121  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:06.136  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:06.136  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:06.636  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:06.637  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:06.649  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:06.750  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:06.763  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:06.763  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:07.263  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:07.264  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:07.276  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:07.377  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:07.388  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:07.389  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:07.890  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:07.890  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:07.902  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:08.003  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:08.014  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:08.014  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:08.515  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:08.516  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:08.529  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:08.629  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:08.641  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:08.641  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:09.141  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:09.142  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:09.157  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:09.258  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:09.270  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:09.270  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:09.771  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:09.772  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:09.786  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:09.887  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:09.902  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:09.902  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:10.403  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:10.403  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:10.420  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:10.521  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:10.536  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:10.537  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:11.037  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:11.037  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:11.049  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:11.150  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:11.163  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:11.163  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:11.664  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:11.664  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:11.675  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:11.776  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:11.788  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:11.788  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:12.289  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:12.290  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:12.302  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:12.402  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:12.414  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:12.414  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:12.915  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:12.915  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:12.927  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:13.028  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:13.039  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:13.039  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:13.540  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:13.541  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:13.553  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:13.653  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:13.666  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:13.666  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:14.167  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:14.168  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:14.181  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:14.282  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:14.296  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:14.296  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:14.797  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:14.797  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:14.810  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:14.911  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:14.923  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:14.923  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:15.423  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:15.423  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:15.435  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:15.536  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:15.547  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:15.548  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:16.048  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:16.049  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:16.060  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:16.161  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:16.172  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:16.172  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:16.673  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:16.674  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:16.686  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:16.786  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:16.800  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:16.800  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:17.301  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:17.301  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:17.325  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:17.425  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:17.443  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:17.443  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:17.944  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:17.944  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:17.957  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:18.058  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:18.071  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:18.071  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:18.572  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:18.572  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:18.584  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:18.684  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:18.698  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:18.698  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:19.199  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:19.199  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:19.211  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:19.311  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:19.324  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:19.324  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:19.825  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP
+2025-04-24 11:46:19.825  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 08 08
+2025-04-24 11:46:19.837  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:19.937  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Sending data: 09 09
+2025-04-24 11:46:19.950  4183-4183  GryphonSerialManager    com.example.coingryphon              D  Data sent via terminal command
+2025-04-24 11:46:19.950  4183-4183  GryphonProtocol         com.example.coingryphon              D  Automatically resent command: SETUP
+2025-04-24 11:46:20.451  4183-4183  GryphonProtocol         com.example.coingryphon              W  Command timeout for: SETUP

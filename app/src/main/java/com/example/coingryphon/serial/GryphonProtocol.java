@@ -25,10 +25,19 @@ public class GryphonProtocol {
     // Command timeout in milliseconds - configurable based on hardware response time
     private static final long COMMAND_TIMEOUT = 1000;
     
+    // Maximum number of automatic retries for each command
+    private static final int MAX_RETRIES = 3;
+    
     private final GryphonSerialManager serialManager;
     private GryphonResponseListener responseListener;
     private CommandType pendingCommand = null;
     private long lastCommandTime = 0;
+    
+    // Retry counters for each command type
+    private int resetRetryCount = 0;
+    private int pollRetryCount = 0;
+    private int setupRetryCount = 0;
+    private int coinTypeRetryCount = 0;
     
     /**
      * Command types for the Gryphon coin acceptor
@@ -154,6 +163,64 @@ public class GryphonProtocol {
             pendingCommand = null;
             lastCommandTime = 0;
             
+            boolean maxRetriesReached = false;
+            
+            // Check if we've reached the maximum retries for this command
+            switch (timedOutCommand) {
+                case POLL:
+                    pollRetryCount++;
+                    if (pollRetryCount > MAX_RETRIES) {
+                        maxRetriesReached = true;
+                        pollRetryCount = 0;
+                    }
+                    break;
+                case RESET:
+                    resetRetryCount++;
+                    if (resetRetryCount > MAX_RETRIES) {
+                        maxRetriesReached = true;
+                        resetRetryCount = 0;
+                    }
+                    break;
+                case SETUP:
+                    setupRetryCount++;
+                    if (setupRetryCount > MAX_RETRIES) {
+                        maxRetriesReached = true;
+                        setupRetryCount = 0;
+                    }
+                    break;
+                case COIN_TYPE:
+                    coinTypeRetryCount++;
+                    if (coinTypeRetryCount > MAX_RETRIES) {
+                        maxRetriesReached = true;
+                        coinTypeRetryCount = 0;
+                    }
+                    break;
+            }
+            
+            if (maxRetriesReached) {
+                Log.d(TAG, "Max retries reached for command: " + timedOutCommand + ", trying SETUP command");
+                
+                // When max retries are reached, try the SETUP command as it's the most important
+                // for resolving 'NO VMC communication' errors
+                if (timedOutCommand != CommandType.SETUP) {
+                    sendSetup();
+                    return;
+                }
+                
+                // If even SETUP command is failing, try sending a complete initialization sequence
+                tryCompleteInitSequence();
+                
+                // Notify listener about the timeout
+                if (responseListener != null) {
+                    responseListener.onCommandResponse(
+                        timedOutCommand,
+                        ResponseStatus.TIMEOUT,
+                        new byte[0]
+                    );
+                }
+                return;
+            }
+            
             // First try sending a reset command to clear any potential error state
             if (timedOutCommand != CommandType.RESET) {
                 try {
@@ -195,6 +262,43 @@ public class GryphonProtocol {
                     new byte[0]
                 );
             }
+        }
+    }
+    
+    /**
+     * Try a complete initialization sequence in order of importance
+     * This is called when we've failed too many times with a specific command
+     */
+    private void tryCompleteInitSequence() {
+        // Reset any pending command state
+        pendingCommand = null;
+        lastCommandTime = 0;
+        
+        Log.d(TAG, "Trying complete initialization sequence");
+        
+        try {
+            // Send RESET command
+            Log.d(TAG, "Init sequence: Sending RESET");
+            serialManager.sendData(CMD_RESET);
+            Thread.sleep(200);
+            
+            // Send SETUP command (most important for NO VMC communication)
+            Log.d(TAG, "Init sequence: Sending SETUP");
+            serialManager.sendData(CMD_SETUP);
+            Thread.sleep(200);
+            
+            // Send COIN_TYPE command
+            Log.d(TAG, "Init sequence: Sending COIN_TYPE");
+            serialManager.sendData(CMD_COIN_TYPE);
+            Thread.sleep(200);
+            
+            // Send POLL command
+            Log.d(TAG, "Init sequence: Sending POLL");
+            serialManager.sendData(CMD_POLL);
+            
+            Log.d(TAG, "Complete initialization sequence sent");
+        } catch (Exception e) {
+            Log.e(TAG, "Error sending initialization sequence: " + e.getMessage());
         }
     }
     
@@ -324,16 +428,28 @@ public class GryphonProtocol {
      * Send Setup command
      * write: 09 09
      * expected response: 03 11 56 01 01 00 03 05 0A 00 00 00 00 00 00 00 00 00 00 00 00 00 00 7E
+     * This is the most important command for resolving 'NO VMC communication' errors
      */
     public boolean sendSetup() {
         if (pendingCommand != null) {
-            return false; // Command in progress
+            // Since SETUP is critical for communication, we can force it even if another command
+            // is pending, with the exception of another SETUP command
+            if (pendingCommand == CommandType.SETUP) {
+                return false; // Another SETUP command is already in progress
+            }
+            
+            Log.d(TAG, "Forcing SETUP command while " + pendingCommand + " is pending");
+            pendingCommand = null; // Clear pending command state
         }
+        
+        // Reset the retry counter when we intentionally send a SETUP command
+        setupRetryCount = 0;
         
         pendingCommand = CommandType.SETUP;
         lastCommandTime = System.currentTimeMillis();
         
-        return serialManager.sendData(CMD_SETUP);
+        boolean result = serialManager.sendData(CMD_SETUP);
+        return result;
     }
     
     /**
