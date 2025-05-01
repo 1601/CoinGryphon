@@ -1,53 +1,50 @@
 package com.example.coingryphon.serial;
 
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbDeviceConnection;
-import android.hardware.usb.UsbManager;
 import android.util.Log;
 
-import com.hoho.android.usbserial.driver.UsbSerialDriver;
-import com.hoho.android.usbserial.driver.UsbSerialPort;
-import com.hoho.android.usbserial.driver.UsbSerialProber;
-import com.hoho.android.usbserial.util.SerialInputOutputManager;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * GryphonSerialManager handles the RS232 communication with the Gryphon device.
  * Communication parameters: 9600 baud rate, 1 start bit, 8 data bits, Mark parity bit, 1 stop bit
+ * 
+ * This implementation uses direct serial port access (/dev/ttyS5).
  */
 public class GryphonSerialManager {
     private static final String TAG = "GryphonSerialManager";
-    private static final String ACTION_USB_PERMISSION = "com.example.coingryphon.USB_PERMISSION";
+    
+    // Serial port path
+    private static final String SERIAL_PORT_PATH = "/dev/ttyS5";
     
     // Communication parameters
     private static final int BAUD_RATE = 9600;
-    private static final int DATA_BITS = UsbSerialPort.DATABITS_8;
-    private static final int STOP_BITS = UsbSerialPort.STOPBITS_1;
-    private static final int PARITY = UsbSerialPort.PARITY_MARK; // Mark parity bit
-    private static final int TIMEOUT = 1000; // Read/write timeout in ms
+    private static final int DATA_BITS = 8;
+    private static final int STOP_BITS = 1;
+    private static final int PARITY_MARK = 3; // Mark parity bit (typically value 3)
+    private static final int PARITY_ODD = 1;  // Alternative: some devices use odd parity (1)
     
     // Singleton instance
     private static GryphonSerialManager instance;
     
     private final Context context;
-    private final UsbManager usbManager;
     private final ExecutorService executor;
     
-    private UsbSerialPort serialPort;
-    private SerialInputOutputManager ioManager;
-    private UsbDevice usbDevice;
-    private UsbSerialDriver driver;
-    private UsbDeviceConnection connection;
+    // Serial port connection
+    private Object serialPort; // This will hold the SerialPort instance
+    private InputStream inputStream;
+    private OutputStream outputStream;
+    private SerialPortReader portReader;
+    private boolean readerRunning = false;
     
     private boolean isConnected = false;
     private GryphonSerialListener listener;
@@ -64,9 +61,7 @@ public class GryphonSerialManager {
 
     private GryphonSerialManager(Context context) {
         this.context = context;
-        this.usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
         this.executor = Executors.newSingleThreadExecutor();
-        registerUsbReceiver();
     }
 
     public static synchronized GryphonSerialManager getInstance(Context context) {
@@ -81,40 +76,10 @@ public class GryphonSerialManager {
     }
 
     /**
-     * Register the USB permission broadcast receiver
-     */
-    private void registerUsbReceiver() {
-        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-        filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-        filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        
-        context.registerReceiver(usbReceiver, filter);
-    }
-
-    /**
-     * Scan for available USB serial devices and request permission
+     * Connect to the serial port device (/dev/ttyS5)
      */
     public boolean connectToDevice() {
-        // Find available drivers
-        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
-        if (availableDrivers.isEmpty()) {
-            Log.d(TAG, "No USB serial devices found");
-            return false;
-        }
-
-        // Open first available driver
-        driver = availableDrivers.get(0);
-        usbDevice = driver.getDevice();
-
-        // Request permission if needed
-        if (!usbManager.hasPermission(usbDevice)) {
-            PendingIntent permissionIntent = PendingIntent.getBroadcast(
-                    context, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
-            usbManager.requestPermission(usbDevice, permissionIntent);
-            return false; // Connection will be completed in broadcast receiver
-        } else {
-            return openConnection();
-        }
+        return openConnection();
     }
     
     /**
@@ -122,33 +87,105 @@ public class GryphonSerialManager {
      */
     private boolean openConnection() {
         try {
-            connection = usbManager.openDevice(usbDevice);
-            if (connection == null) {
-                Log.e(TAG, "Failed to open USB device connection");
+            // Create the serial port file
+            File device = new File(SERIAL_PORT_PATH);
+            
+            if (!device.exists()) {
+                Log.e(TAG, "Serial port " + SERIAL_PORT_PATH + " does not exist");
                 return false;
             }
             
-            serialPort = driver.getPorts().get(0); // Assuming single-port device
-            serialPort.open(connection);
-            serialPort.setParameters(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY);
+            // Try to set permissions
+            try {
+                Process process = Runtime.getRuntime().exec("chmod 666 " + SERIAL_PORT_PATH);
+                process.waitFor();
+                Log.d(TAG, "Set permissions for " + SERIAL_PORT_PATH);
+            } catch (Exception e) {
+                Log.w(TAG, "Could not set permissions: " + e.getMessage());
+                // Continue anyway - permissions might already be correct
+            }
             
-            // Start the I/O manager to handle incoming data
-            ioManager = new SerialInputOutputManager(serialPort, serialIOListener);
-            executor.submit(ioManager);
+            // Try to configure serial port parameters with stty
+            try {
+                // Try multiple configurations for maximum compatibility
+                
+                // Mark parity
+                String sttyCommand1 = "stty -F " + SERIAL_PORT_PATH + " " + 
+                        BAUD_RATE + " cs8 -cstopb parenb parmrk -crtscts -ixon -ixoff raw";
+                Process process1 = Runtime.getRuntime().exec(sttyCommand1);
+                process1.waitFor();
+                
+                // Odd parity (some devices interpret mark as odd)
+                String sttyCommand2 = "stty -F " + SERIAL_PORT_PATH + " " + 
+                        BAUD_RATE + " cs8 -cstopb parenb parodd -crtscts -ixon -ixoff raw";
+                Process process2 = Runtime.getRuntime().exec(sttyCommand2);
+                process2.waitFor();
+                
+                // No parity (fallback)
+                String sttyCommand3 = "stty -F " + SERIAL_PORT_PATH + " " + 
+                        BAUD_RATE + " cs8 -cstopb -parenb -crtscts -ixon -ixoff raw";
+                Process process3 = Runtime.getRuntime().exec(sttyCommand3);
+                process3.waitFor();
+                
+                Log.d(TAG, "Configured serial port parameters");
+            } catch (Exception e) {
+                Log.w(TAG, "Could not configure serial port: " + e.getMessage());
+                // Continue anyway - parameters might be set correctly at the system level
+            }
+            
+            // Try to use the SerialPort API if available
+            try {
+                // Load the SerialPort class
+                Class<?> SerialPortClass = Class.forName("android_serialport_api.SerialPort");
+                
+                // Get constructor
+                java.lang.reflect.Constructor<?> constructor = SerialPortClass.getConstructor(
+                        File.class, int.class, int.class);
+                
+                // Create instance
+                int flags = (DATA_BITS | (STOP_BITS << 8) | (PARITY_MARK << 16));
+                serialPort = constructor.newInstance(device, BAUD_RATE, flags);
+                
+                // Get streams
+                Method getInputStreamMethod = SerialPortClass.getMethod("getInputStream");
+                Method getOutputStreamMethod = SerialPortClass.getMethod("getOutputStream");
+                
+                inputStream = (InputStream) getInputStreamMethod.invoke(serialPort);
+                outputStream = (OutputStream) getOutputStreamMethod.invoke(serialPort);
+                
+                Log.d(TAG, "Opened serial port with SerialPort API");
+            } catch (Exception e) {
+                Log.w(TAG, "SerialPort API not available, using direct file I/O: " + e.getMessage());
+                
+                // Fall back to direct file I/O
+                try {
+                    inputStream = new FileInputStream(device);
+                    outputStream = new FileOutputStream(device);
+                    Log.d(TAG, "Opened serial port with direct file I/O");
+                } catch (Exception ex) {
+                    Log.e(TAG, "Failed to open serial port with direct file I/O", ex);
+                    return false;
+                }
+            }
+            
+            // Start reader thread
+            portReader = new SerialPortReader();
+            readerRunning = true;
+            executor.submit(portReader);
             
             isConnected = true;
             if (listener != null) {
                 listener.onConnectionEstablished();
             }
             
-            Log.d(TAG, "Serial connection established with Gryphon");
+            Log.d(TAG, "Serial connection established");
             return true;
         } catch (Exception e) {
             Log.e(TAG, "Error opening serial connection", e);
+            closeConnection();
             if (listener != null) {
                 listener.onError(e);
             }
-            closeConnection();
             return false;
         }
     }
@@ -158,48 +195,138 @@ public class GryphonSerialManager {
      */
     public void closeConnection() {
         isConnected = false;
+        readerRunning = false;
         
-        if (ioManager != null) {
-            ioManager.stop();
-            ioManager = null;
+        try {
+            if (inputStream != null) {
+                inputStream.close();
+                inputStream = null;
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Error closing input stream", e);
         }
         
+        try {
+            if (outputStream != null) {
+                outputStream.close();
+                outputStream = null;
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Error closing output stream", e);
+        }
+        
+        // Close the SerialPort instance if available
         if (serialPort != null) {
             try {
-                serialPort.close();
-            } catch (IOException e) {
+                Method closeMethod = serialPort.getClass().getMethod("close");
+                closeMethod.invoke(serialPort);
+            } catch (Exception e) {
                 Log.e(TAG, "Error closing serial port", e);
             }
             serialPort = null;
         }
         
-        if (connection != null) {
-            connection = null;
-        }
-        
         Log.d(TAG, "Serial connection closed");
     }
 
+    /**
+     * Check if the device is connected
+     */
     public boolean isConnected() {
         return isConnected;
     }
     
     /**
-     * Send data to the Gryphon device
-     * @param data byte array to send
-     * @return true if data was sent successfully
+     * Send data to the serial port
+     * @param data Data to send
+     * @return true if sent successfully
      */
     public boolean sendData(byte[] data) {
-        if (!isConnected || serialPort == null) {
-            Log.e(TAG, "Cannot send data. Device not connected.");
+        if (!isConnected || outputStream == null) {
+            Log.e(TAG, "Cannot send data - port not open");
             return false;
         }
+
+        Log.d(TAG, "Sending data: " + bytesToHexString(data));
+        boolean success = false;
         
         try {
-            serialPort.write(data, TIMEOUT);
-            Log.d(TAG, "Data sent: " + bytesToHexString(data));
+            // First clear any pending input
+            try {
+                if (inputStream != null && inputStream.available() > 0) {
+                    byte[] buffer = new byte[inputStream.available()];
+                    int bytesRead = inputStream.read(buffer);
+                    if (bytesRead > 0) {
+                        Log.d(TAG, "Cleared input buffer: " + bytesToHexString(buffer));
+                    }
+                }
+            } catch (IOException e) {
+                Log.w(TAG, "Failed to clear input buffer: " + e.getMessage());
+            }
+            
+            // Method 1: Terminal command (echo) - working based on logs
+            try {
+                StringBuilder hexString = new StringBuilder();
+                for (byte b : data) {
+                    hexString.append(String.format("\\\\x%02X", b));
+                }
+                
+                String command = "echo -n -e '" + hexString + "' > " + SERIAL_PORT_PATH;
+                Process process = Runtime.getRuntime().exec(new String[]{"sh", "-c", command});
+                int result = process.waitFor();
+                
+                if (result == 0) {
+                    Log.d(TAG, "Data sent via terminal command");
+                    success = true;
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "Terminal command failed: " + e.getMessage());
+                // Continue to next method
+            }
+            
+            // Method 2: Java OutputStream with byte-by-byte and delays
+            if (!success) {
+                try {
+                    // Add slightly longer delay between bytes for more reliable communication
+                    for (byte b : data) {
+                        outputStream.write(b);
+                        outputStream.flush();
+                        Thread.sleep(30); // Increased delay for hardware to process
+                    }
+                    // Add final delay and flush to ensure all data is sent
+                    Thread.sleep(20);
+                    outputStream.flush();
+                    Log.d(TAG, "Data sent via OutputStream (byte by byte)");
+                    success = true;
+                } catch (Exception e) {
+                    Log.w(TAG, "OutputStream byte-by-byte send failed: " + e.getMessage());
+                    // Continue to next method
+                }
+            }
+            
+            // Method 3: Java OutputStream all at once (last resort)
+            if (!success) {
+                try {
+                    outputStream.write(data);
+                    outputStream.flush();
+                    // Add a small delay after sending for better reliability
+                    Thread.sleep(10);
+                    Log.d(TAG, "Data sent via OutputStream (all at once)");
+                    success = true;
+                } catch (Exception e) {
+                    Log.e(TAG, "OutputStream all-at-once send failed: " + e.getMessage());
+                    // No more methods to try
+                }
+            }
+            
+            // Report failure if all methods failed
+            if (!success) {
+                Log.e(TAG, "Failed to send data through any method");
+                return false;
+            }
+            
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, "Error sending data", e);
             if (listener != null) {
                 listener.onError(e);
@@ -207,7 +334,7 @@ public class GryphonSerialManager {
             return false;
         }
     }
-
+    
     /**
      * Convert byte array to hex string for debugging
      */
@@ -218,75 +345,50 @@ public class GryphonSerialManager {
         }
         return sb.toString().trim();
     }
-
-    /**
-     * Handle incoming serial data
-     */
-    private final SerialInputOutputManager.Listener serialIOListener = new SerialInputOutputManager.Listener() {
-        @Override
-        public void onNewData(byte[] data) {
-            Log.d(TAG, "Data received: " + bytesToHexString(data));
-            if (listener != null) {
-                listener.onReceiveData(data);
-            }
-        }
-
-        @Override
-        public void onRunError(Exception e) {
-            Log.e(TAG, "Serial communication error", e);
-            if (listener != null) {
-                listener.onError(e);
-                listener.onConnectionLost();
-            }
-            isConnected = false;
-        }
-    };
     
     /**
-     * USB permission and device attachment/detachment broadcast receiver
+     * Serial port reader thread
      */
-    private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
+    private class SerialPortReader implements Runnable {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (ACTION_USB_PERMISSION.equals(action)) {
-                synchronized (this) {
-                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        if (device != null) {
-                            // Permission granted, open the connection
-                            usbDevice = device;
-                            openConnection();
+        public void run() {
+            byte[] buffer = new byte[1024];
+            int len;
+            
+            while (readerRunning) {
+                try {
+                    if (inputStream != null && inputStream.available() > 0) {
+                        len = inputStream.read(buffer);
+                        if (len > 0) {
+                            byte[] data = Arrays.copyOf(buffer, len);
+                            Log.d(TAG, "Data received: " + bytesToHexString(data));
+                            
+                            if (listener != null) {
+                                listener.onReceiveData(data);
+                            }
                         }
-                    } else {
-                        Log.d(TAG, "USB permission denied for device " + device);
                     }
-                }
-            } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-                // Attempt to connect when new device is attached
-                connectToDevice();
-            } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                if (device != null && device.equals(usbDevice)) {
-                    // Close connection if the device is detached
+                    
+                    // Sleep to avoid high CPU usage
+                    Thread.sleep(10);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error reading from serial port", e);
                     if (listener != null) {
+                        listener.onError(e);
                         listener.onConnectionLost();
                     }
-                    closeConnection();
+                    isConnected = false;
+                    readerRunning = false;
+                    break;
                 }
             }
         }
-    };
-
+    }
+    
     /**
-     * Unregister receivers when the app is closing
+     * Clean up resources when the app is closing
      */
     public void destroy() {
-        try {
-            context.unregisterReceiver(usbReceiver);
-        } catch (Exception e) {
-            Log.e(TAG, "Error unregistering receiver", e);
-        }
         closeConnection();
         executor.shutdownNow();
     }

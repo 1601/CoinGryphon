@@ -22,7 +22,7 @@ public class GryphonProtocol {
     private static final byte RESP_ACK = 0x00;
     private static final byte[] RESP_POLL_COIN = new byte[] {0x51, 0x0E, 0x5F};
     
-    // Command timeout in milliseconds - configurable based on hardware response time
+    // Command timeout in milliseconds
     private static final long COMMAND_TIMEOUT = 1000;
     
     private final GryphonSerialManager serialManager;
@@ -132,10 +132,6 @@ public class GryphonProtocol {
             case COIN_TYPE:
                 processCoinTypeResponse(data);
                 break;
-                
-            default:
-                Log.w(TAG, "Unknown command type: " + currentCommand);
-                break;
         }
     }
     
@@ -143,10 +139,12 @@ public class GryphonProtocol {
      * Check for command timeouts
      */
     public void checkTimeouts() {
-        // For more aggressive retries, use a shorter timeout
+        // Shorter timeout for more aggressive retry
         final long shortTimeout = COMMAND_TIMEOUT / 2;  // 500ms instead of 1000ms
         
-        if (pendingCommand != null && (System.currentTimeMillis() - lastCommandTime) > shortTimeout) {
+        if (pendingCommand != null && 
+            (System.currentTimeMillis() - lastCommandTime) > shortTimeout) {
+            
             Log.w(TAG, "Command timeout for: " + pendingCommand);
             CommandType timedOutCommand = pendingCommand;
             
@@ -187,12 +185,11 @@ public class GryphonProtocol {
                 return; // Don't notify about timeout since we retried
             }
             
-            // If we couldn't resend, notify listener about timeout
             if (responseListener != null) {
                 responseListener.onCommandResponse(
                     timedOutCommand,
                     ResponseStatus.TIMEOUT,
-                    new byte[0]
+                    null
                 );
             }
         }
@@ -235,8 +232,7 @@ public class GryphonProtocol {
      */
     private void processPollResponse(byte[] data) {
         if (data.length == 1 && data[0] == RESP_ACK) {
-            // Standard ACK response - no coin inserted
-            Log.d(TAG, "Poll response: ACK (no coin)");
+            // Acknowledged - no coin
             if (responseListener != null) {
                 responseListener.onCommandResponse(
                     CommandType.POLL,
@@ -244,9 +240,9 @@ public class GryphonProtocol {
                     data
                 );
             }
-        } else if (data.length == 3 && Arrays.equals(data, RESP_POLL_COIN)) {
-            // Coin accepted response
-            Log.d(TAG, "Poll response: COIN ACCEPTED");
+        } else if (data.length == 3 && 
+                  Arrays.equals(data, RESP_POLL_COIN)) {
+            // Coin accepted
             if (responseListener != null) {
                 responseListener.onCommandResponse(
                     CommandType.POLL,
@@ -255,8 +251,7 @@ public class GryphonProtocol {
                 );
             }
         } else {
-            // Unknown or error response
-            Log.w(TAG, "Unexpected poll response: " + serialManager.bytesToHexString(data));
+            // Error or unknown response
             if (responseListener != null) {
                 responseListener.onCommandResponse(
                     CommandType.POLL,
@@ -283,14 +278,19 @@ public class GryphonProtocol {
         lastCommandTime = System.currentTimeMillis();
         
         // Try multiple approaches to send the command for better reliability
-        boolean result = false;
         
-        // Skip the root method as it's consistently failing and causing errors
-        // Just use the standard, more reliable method
-        result = serialManager.sendData(CMD_RESET);
+        // First, try to use direct file write via root (may work on rooted devices)
+        try {
+            Process process = Runtime.getRuntime().exec("su -c 'echo -ne \\x08\\x08 > " + "/dev/ttyS3' ");
+            int result = process.waitFor();
+            Log.d(TAG, "Direct root reset command result: " + result);
+        } catch (Exception e) {
+            Log.d(TAG, "Root access for reset command failed: " + e.getMessage());
+            // This is expected to fail on non-rooted devices, so we'll continue with normal approach
+        }
         
-        // If we get here, log the command status
-        Log.d(TAG, "Reset command sent with result: " + result);
+        // Standard approach
+        boolean result = serialManager.sendData(CMD_RESET);
         
         return result;
     }
